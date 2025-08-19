@@ -1,6 +1,6 @@
 'use strict'
 
-const t = require('node:test')
+const t = require('tap')
 // Tests skip on win32 platforms due SIGINT signal is not supported across all windows platforms
 const test = (process.platform === 'win32') ? t.skip : t.test
 const sinon = require('sinon')
@@ -32,18 +32,20 @@ t.afterEach(async () => {
 test('should add and remove SIGINT listener as expected ', async t => {
   t.plan(2)
 
-  t.assert.strictEqual(process.listenerCount('SIGINT'), signalCounter + 1)
+  t.equal(process.listenerCount('SIGINT'), signalCounter + 1)
 
   await fastify.close()
 
-  t.assert.strictEqual(process.listenerCount('SIGINT'), signalCounter)
+  t.equal(process.listenerCount('SIGINT'), signalCounter)
+
+  t.end()
 })
 
-test('should have called fastify.close() when receives a SIGINT signal', (t, end) => {
+test('should have called fastify.close() when receives a SIGINT signal', async t => {
   process.once('SIGINT', () => {
     sinon.assert.called(spy)
 
-    end()
+    t.end()
 
     process.exit()
   })
